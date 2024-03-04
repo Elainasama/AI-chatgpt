@@ -9,8 +9,9 @@ public class Answer {
     private String id;
     private String object;
     private int created;
-    private String model;
-    private List<Choices> choices;
+    private String result;
+    private boolean is_truncated;
+    private boolean need_clear_history;
+    private String finish_reason;
     private Usage usage;
-    private String system_fingerprint;
 }

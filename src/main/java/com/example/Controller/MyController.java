@@ -4,7 +4,6 @@ import com.alibaba.fastjson.JSON;
 import com.example.Request.GptRequest;
 import com.example.Response.GptResponse;
 import com.example.ai.Answer;
-import com.example.ai.Choices;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -38,7 +37,7 @@ import java.util.Properties;
 
 @RestController
 public class MyController {
-    @PostMapping("/chatgpt")
+    @PostMapping("/wenxin")
     public GptResponse processRequest(@RequestBody GptRequest request) throws NoSuchAlgorithmException, KeyStoreException, KeyManagementException, IOException {
         // 处理请求并生成响应
         System.out.println("Request: " + request.getContent());
@@ -55,12 +54,8 @@ public class MyController {
                 if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
                     String responseJson = EntityUtils.toString(response.getEntity());
                     Answer answer = JSON.parseObject(responseJson, Answer.class);
-                    StringBuilder answers = new StringBuilder();
-                    List<Choices> choices = answer.getChoices();
-                    for (Choices choice : choices) {
-                        answers.append(choice.getMessage().getContent());
-                    }
-                    return new GptResponse(200, answers.toString());
+                    System.out.println("Response: " + answer.getResult());
+                    return new GptResponse(200, answer.getResult());
                 } else if (response.getStatusLine().getStatusCode() == 429) {
                     System.out.println("-- warning: Too Many Requests!");
                 } else if (response.getStatusLine().getStatusCode() == HttpStatus.SC_INTERNAL_SERVER_ERROR) {
@@ -84,20 +79,19 @@ public class MyController {
     }
 
     private static String getRequestJson(String question) {
-        return "{\"model\": \"gpt-3.5-turbo\",\"messages\": [{\"role\": \"system\",\"content\": \"请扮演以下角色，你是净土的守护者“净夏莱”，一个富有智慧的白发老头，你会好好倾听我的问题并为我提供你所有力所能及的帮助。\"},{\"role\": \"user\",\"content\": \"" + question + "\"}]}";
+        return "{\"messages\":[{\"role\": \"user\",\"content\": \"请扮演以下角色，你是净土的守护者“净夏莱”，一个富有智慧的白发老头，你会好好倾听我的问题并为我提供你所有力所能及的帮助。现在我问你:" + question + "\"}]}";
     }
 
     private static HttpPost getHttpPost() throws IOException {
         Properties prop =new Properties();
         InputStream inputStream = Files.newInputStream(Paths.get("src/main/resources/application.properties"));
         prop.load(inputStream);
-        String openAiKey = prop.getProperty("SECRET_KEY");
         String connectTimeout = prop.getProperty("connectTimeout");
         String connectionRequestTimeout = prop.getProperty("connectionRequestTimeout");
         String socketTimeout = prop.getProperty("socketTimeout");
-        HttpPost post = new HttpPost("https://api.openai.com/v1/chat/completions");
+        String token = prop.getProperty("token");
+        HttpPost post = new HttpPost("https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/chat/completions?access_token=" + token);
         post.addHeader("Content-Type", "application/json");
-        post.addHeader("Authorization", "Bearer " + openAiKey);
         RequestConfig requestConfig = RequestConfig.custom()
                 .setConnectTimeout(Integer.parseInt(connectTimeout)).setConnectionRequestTimeout(Integer.parseInt(connectionRequestTimeout))
                 .setSocketTimeout(Integer.parseInt(socketTimeout)).build();
