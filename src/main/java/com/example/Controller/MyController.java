@@ -20,7 +20,7 @@ import org.apache.http.util.EntityUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import com.example.tokenTask;
+
 import javax.net.ssl.SSLContext;
 import java.io.IOException;
 import java.io.InputStream;
@@ -32,11 +32,12 @@ import java.rmi.ServerException;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.util.List;
 import java.util.Properties;
 
 @RestController
 public class MyController {
-    @PostMapping("/chatgpt")
+    @PostMapping("/wenxin")
     public GptResponse processRequest(@RequestBody GptRequest request) throws NoSuchAlgorithmException, KeyStoreException, KeyManagementException, IOException {
         // 处理请求并生成响应
         System.out.println("Request: " + request.getContent());
@@ -53,9 +54,7 @@ public class MyController {
                 if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
                     String responseJson = EntityUtils.toString(response.getEntity());
                     Answer answer = JSON.parseObject(responseJson, Answer.class);
-                    if (answer.getResult() == null) {
-                        return new GptResponse(500, null);
-                    }
+                    System.out.println("Response: " + answer.getResult());
                     return new GptResponse(200, answer.getResult());
                 } else if (response.getStatusLine().getStatusCode() == 429) {
                     System.out.println("-- warning: Too Many Requests!");
@@ -90,7 +89,7 @@ public class MyController {
         String connectTimeout = prop.getProperty("connectTimeout");
         String connectionRequestTimeout = prop.getProperty("connectionRequestTimeout");
         String socketTimeout = prop.getProperty("socketTimeout");
-        String token = tokenTask.token;
+        String token = prop.getProperty("token");
         HttpPost post = new HttpPost("https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/chat/completions?access_token=" + token);
         post.addHeader("Content-Type", "application/json");
         RequestConfig requestConfig = RequestConfig.custom()
