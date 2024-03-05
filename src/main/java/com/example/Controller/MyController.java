@@ -80,7 +80,7 @@ public class MyController {
     }
 
     private static String getRequestJson(String question) {
-        return "{\"messages\":[{\"role\": \"user\",\"content\": \"请扮演以下角色，你是净土的守护者“净夏莱”，一个富有智慧的白发老头，你会好好倾听我的问题并为我提供你所有力所能及的帮助。现在我问你:" + question + "\"}]}";
+        return "{\"messages\":[{\"role\": \"user\",\"content\": \"请扮演以下角色，你是净土的守护者“净夏莱”，一个富有智慧的白发老头，你会好好倾听我的问题并为我提供你所有力所能及的帮助,请不要说出你在扮演，现在我问你:" + question + "\"}]}";
     }
 
     private static HttpPost getHttpPost() throws IOException {
